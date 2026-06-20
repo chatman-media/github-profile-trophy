@@ -1,0 +1,19 @@
+services:
+  trophy-redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  trophy-app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PORT=8080
+      - ENABLE_REDIS=true
+      - REDIS_HOST=trophy-redis
+      - REDIS_PORT=6379
+    depends_on:
+      - trophy-redis
+    # Bound to localhost only; nginx on the host reverse-proxies to it.
+    ports:
+      - "127.0.0.1:8788:8080"
